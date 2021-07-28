@@ -7,35 +7,22 @@ const bot = new TlgApi(token, {polling: true});
 bot.setMyCommands([
 	{command: '/start', description: 'Приветствие'},
 	{command: '/info', description: 'Информация о боте'},
-	{command: '/game', description: 'Старт игры'},
+	{command: '/getmovie', description: 'Давай мне фильм!'},
 ])
 
-const chats = {}
-
-const gameOptions = {
-	reply_markup: JSON.stringify({
-		inline_keyboard: [
-			[{text: '1', callback_data: '1'}, {text: '2', callback_data: '2'}, {text: '3', callback_data: '3'}],
-			[{text: '4', callback_data: '4'}, {text: '5', callback_data: '5'}, {text: '6', callback_data: '6'}],
-			[{text: '7', callback_data: '7'}, {text: '8', callback_data: '8'}, {text: '9', callback_data: '9'}],
-			[{text: '0', callback_data: '0'}],
-		]
-	})
-}
-
-const againOptions = {
-	reply_markup: JSON.stringify({
-		inline_keyboard: [
-			[{text: 'Играть еще раз', callback_data: '/again'}],
-		]
-	})
-}
-
-const startGame = async (chatId) => {
-	await bot.sendMessage(chatId, 'Сейчас я загадаю число от 0 до 9, а ты попробуй его отгадать!');
-	chats[chatId] = Math.floor(Math.random() * 10);
-	await bot.sendMessage(chatId, 'Начинай', gameOptions);
-}
+const films = [
+	'Криминальное чтиво',
+	'Джобс',
+	'Вселенная Стивена Хокинга',
+	'Интерстеллар',
+	'Джентельмены',
+	'Хелсинг',
+	'Лицо со шрамом',
+	'Джанго Освобожденный',
+	'Богемская Рапсодия',
+	'Джон Уик',
+	'Адвокат Дьявола'
+]
 
 const start = () => {
 	bot.on('message', async msg => {
@@ -46,26 +33,12 @@ const start = () => {
 			case '/start':
 				return bot.sendMessage(chatId, `Привет, ${msg.from.first_name}! Я - бот AP101bot`);
 			case '/info':
-				return bot.sendMessage(chatId, `Я - бот AP101bot! Я пока ниче не могу:(`);
-			case '/game':
-				return  startGame(chatId);
+				return bot.sendMessage(chatId, `Я - бот AP101bot! Тыкай на кнопки команд и получишь рандомный фильм на вечер!`);
+			case '/getmovie':
+				const randomNum = Math.floor(Math.random() * 10);
+				return bot.sendMessage(chatId, `Твой фильм на вечер - ${films[randomNum]}`);
 			default:
 				return bot.sendMessage(chatId, 'Не понимаю че ты хочешь...тут есть кнопочка -> там можешь поглядеть на команды');
-		}
-	});
-
-	bot.on('callback_query', msg => {
-		const data = msg.data;
-		const chatId = msg.message.chat.id;
-
-		if(data === '/again') {
-			return  startGame(chatId);
-		}
-
-		if(data === chats[chatId].toString()) {
-			return bot.sendMessage(chatId, `Мои поздравления. Я на самом деле загадал число ${chats[chatId]}. U win!`, againOptions);
-		} else {
-			return bot.sendMessage(chatId, `Не верно. Я загадал число ${chats[chatId]}`, againOptions);
 		}
 	});
 };
