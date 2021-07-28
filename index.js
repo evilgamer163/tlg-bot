@@ -33,8 +33,7 @@ const againOptions = {
 
 const startGame = async (chatId) => {
 	await bot.sendMessage(chatId, 'Сейчас я загадаю число от 0 до 9, а ты попробуй его отгадать!');
-	const randomNum = Math.floor(Math.random() * 10);
-	chats[chatId] = randomNum;
+	chats[chatId] = Math.floor(Math.random() * 10);
 	await bot.sendMessage(chatId, 'Начинай', gameOptions);
 }
 
@@ -43,20 +42,16 @@ const start = () => {
 		const text = msg.text;
 		const chatId = msg.chat.id;
 
-		if(text === '/start') {
-			return bot.sendMessage(chatId, `Привет, ${msg.from.first_name}! Я - бот AP101bot`);
-			// await bot.sendSticker(chatId, 'https://tlgrm.ru/_/stickers/ea5/382/ea53826d-c192-376a-b766-e5abc535f1c9/7.jpg');
+		switch(text) {
+			case '/start':
+				return bot.sendMessage(chatId, `Привет, ${msg.from.first_name}! Я - бот AP101bot`);
+			case '/info':
+				return bot.sendMessage(chatId, `Я - бот AP101bot! Я пока ниче не могу:(`);
+			case '/game':
+				return  startGame(chatId);
+			default:
+				return bot.sendMessage(chatId, 'Не понимаю че ты хочешь...тут есть кнопочка -> там можешь поглядеть на команды');
 		}
-
-		if(text === '/info') {
-			return bot.sendMessage(chatId, `Я - бот AP101bot! Я пока ниче не могу:(`);
-		}
-
-		if(text === '/game') {
-			return  startGame(chatId);
-		}
-
-		return bot.sendMessage(chatId, 'Не понимаю че ты хочешь...тут есть кнопочка -> там можешь поглядеть на команды');
 	});
 
 	bot.on('callback_query', msg => {
